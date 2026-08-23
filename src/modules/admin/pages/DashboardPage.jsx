@@ -1,5 +1,5 @@
-import DashboardContent from '../../../shared/components/DashboardContent'
+import AdminDashboard from './AdminDashboard'
 
 export default function DashboardPage() {
-  return <DashboardContent />
+  return <AdminDashboard />
 }

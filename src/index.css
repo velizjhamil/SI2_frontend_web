@@ -1,1 +1,101 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+
+/* ── CoopIA Design Tokens ────────────────────────────────────────────────── */
+@theme {
+  /* ── Paleta principal CoopIA ── */
+  --color-coopia-green:        #1A3B2B;   /* verde bosque — sidebar, branding */
+  --color-coopia-green-light:  #234d39;   /* hover sobre verde */
+  --color-coopia-green-soft:   #e8f5ee;   /* tint suave para badges/chips */
+  --color-coopia-green-fg:     #c6f0d8;   /* texto sobre bg verde oscuro */
+
+  --color-coopia-navy:         #111827;   /* azul marino casi negro — texto principal */
+  --color-coopia-navy-soft:    #1f2937;   /* headers, subheadings */
+
+  --color-coopia-accent:       #F4C553;   /* oro suave — botones de acción primaria */
+  --color-coopia-accent-hover: #e6b43e;   /* hover del dorado */
+  --color-coopia-accent-fg:    #111827;   /* texto sobre botón dorado */
+
+  --color-coopia-bg:           #F8F9FA;   /* fondo general — nunca blanco puro */
+  --color-coopia-card:         #ffffff;   /* cards y formularios */
+  --color-coopia-border:       rgba(17,24,39,0.07); /* bordes ultra sutiles */
+  --color-coopia-muted:        #6b7280;   /* texto secundario */
+
+  /* ── Tipografía ── */
+  --font-sans: "Poppins", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Sombras ── */
+  --shadow-card:       0 0 0 1px rgba(17,24,39,0.05), 0 1px 4px rgba(17,24,39,0.05);
+  --shadow-card-hover: 0 0 0 1px rgba(17,24,39,0.08), 0 6px 20px rgba(17,24,39,0.08);
+  --shadow-metric:     0 2px 12px rgba(17,24,39,0.06), 0 1px 3px rgba(17,24,39,0.04);
+  --shadow-sidebar:    4px 0 24px rgba(17,24,39,0.12);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-coopia-bg);
+  color: var(--color-coopia-navy);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  text-wrap: balance;
+  letter-spacing: -0.018em;
+  color: var(--color-coopia-navy);
+}
+
+/* ── Utilities CoopIA ─────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Green */
+  .bg-coopia-green        { background-color: var(--color-coopia-green); }
+  .bg-coopia-green-light  { background-color: var(--color-coopia-green-light); }
+  .bg-coopia-green-soft   { background-color: var(--color-coopia-green-soft); }
+  .text-coopia-green      { color: var(--color-coopia-green); }
+  .text-coopia-green-fg   { color: var(--color-coopia-green-fg); }
+  .border-coopia-green    { border-color: var(--color-coopia-green); }
+
+  /* Navy */
+  .text-coopia-navy       { color: var(--color-coopia-navy); }
+  .bg-coopia-navy         { background-color: var(--color-coopia-navy); }
+
+  /* Accent dorado */
+  .bg-coopia-accent       { background-color: var(--color-coopia-accent); }
+  .bg-coopia-accent-hover { background-color: var(--color-coopia-accent-hover); }
+  .text-coopia-accent     { color: var(--color-coopia-accent); }
+  .text-coopia-accent-fg  { color: var(--color-coopia-accent-fg); }
+
+  /* Fondos */
+  .bg-coopia-bg           { background-color: var(--color-coopia-bg); }
+  .bg-coopia-card         { background-color: var(--color-coopia-card); }
+  .text-coopia-muted      { color: var(--color-coopia-muted); }
+
+  /* Sombras */
+  .shadow-card            { box-shadow: var(--shadow-card); }
+  .shadow-card-hover      { box-shadow: var(--shadow-card-hover); }
+  .shadow-metric          { box-shadow: var(--shadow-metric); }
+  .shadow-sidebar         { box-shadow: var(--shadow-sidebar); }
+
+  /* Backward compat — aliases previos */
+  .bg-forest              { background-color: var(--color-coopia-green); }
+  .bg-forest-2            { background-color: var(--color-coopia-green-light); }
+  .text-forest            { color: var(--color-coopia-green); }
+  .text-forest-fg         { color: var(--color-coopia-green-fg); }
+  .bg-navy                { background-color: var(--color-coopia-navy); }
+  .bg-navy-2              { background-color: var(--color-coopia-navy-soft); }
+  .text-navy              { color: var(--color-coopia-navy); }
+
+  /* Animaciones */
+  .animate-fade-in  { animation: fadeIn  0.2s  cubic-bezier(0.23,1,0.32,1) both; }
+  .animate-slide-up { animation: slideUp 0.25s cubic-bezier(0.23,1,0.32,1) both; }
+}
+
+@keyframes fadeIn  { from { opacity: 0; }                           to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

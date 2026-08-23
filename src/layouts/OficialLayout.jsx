@@ -1,0 +1,11 @@
+import AppShell from './components/AppShell'
+
+const NAV_ITEMS = [
+  { label: 'Dashboard', path: '/oficial/dashboard' },
+  { label: 'Créditos', path: '/oficial/creditos' },
+  { label: 'Socios', path: '/oficial/socios' },
+]
+
+export default function OficialLayout() {
+  return <AppShell navItems={NAV_ITEMS} />
+}
