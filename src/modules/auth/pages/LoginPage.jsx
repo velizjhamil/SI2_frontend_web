@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   selectStatus,
   useAuthStore,
@@ -39,6 +39,46 @@ function CoopIALoginMark() {
   )
 }
 
+// ── Ícono ojo (mostrar) / ojo tachado (ocultar) ──────────────────────────
+function EyeIcon({ open }) {
+  if (open) {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    )
+  }
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  )
+}
+
 const FIELD_CLASS =
   'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 ' +
   'placeholder-slate-400 outline-none transition duration-150 ' +
@@ -51,9 +91,10 @@ export default function LoginPage() {
   const status    = useAuthStore(selectStatus)
   const login     = useAuthStore((state) => state.login)
 
-  const [correo,       setCorreo]       = useState('')
-  const [contrasena,   setContrasena]   = useState('')
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [correo,         setCorreo]         = useState('')
+  const [contrasena,     setContrasena]     = useState('')
+  const [mostrarPass,    setMostrarPass]    = useState(false)
+  const [errorMessage,   setErrorMessage]   = useState(null)
 
   const isLoading = status === 'loading'
 
@@ -114,23 +155,44 @@ export default function LoginPage() {
 
         {/* Contraseña */}
         <div>
-          <label
-            htmlFor="contrasena"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
-            Contraseña
-          </label>
-          <input
-            id="contrasena"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
-            placeholder="••••••••"
-            className={FIELD_CLASS}
-            disabled={isLoading}
-          />
+          <div className="mb-1.5 flex items-center justify-between">
+            <label
+              htmlFor="contrasena"
+              className="block text-sm font-medium text-slate-700"
+            >
+              Contraseña
+            </label>
+            <Link
+              to="/recuperar"
+              className="text-xs font-medium text-navy hover:text-navy-2 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+          <div className="relative">
+            <input
+              id="contrasena"
+              type={mostrarPass ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
+              placeholder="••••••••"
+              className={`${FIELD_CLASS} pr-11`}
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarPass((v) => !v)}
+              disabled={isLoading}
+              aria-label={mostrarPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              aria-pressed={mostrarPass}
+              title={mostrarPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              className="absolute inset-y-0 right-0 flex items-center justify-center px-3 text-slate-400 transition hover:text-navy focus:outline-none focus-visible:text-navy disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <EyeIcon open={mostrarPass} />
+            </button>
+          </div>
         </div>
 
         {/* Error */}

@@ -82,7 +82,7 @@ configureAuthInterceptors({
 })
 
 export const selectIsAuthenticated = (state) =>
-  Boolean(state.token && Date.now() < state.expiresAt)
+  Boolean(state.token && Date.now() < state.expiresAt && state.user)
 
 export const selectUser = (state) => state.user
 

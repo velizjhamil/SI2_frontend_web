@@ -15,6 +15,8 @@ import SocioLayout from '../layouts/SocioLayout'
 import SuperAdminLayout from '../layouts/SuperAdminLayout'
 
 import LoginPage from '../modules/auth/pages/LoginPage'
+import ForgotPasswordPage from '../modules/auth/pages/ForgotPasswordPage'
+import ResetPasswordPage from '../modules/auth/pages/ResetPasswordPage'
 
 // ── SuperAdmin ────────────────────────────────────────────────
 import SuperAdminCooperativasPage from '../modules/superadmin/pages/CooperativasPage'
@@ -62,6 +64,8 @@ export default function AppRouter() {
       <Route element={<GuestRoute />}>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/recuperar" element={<ForgotPasswordPage />} />
+          <Route path="/recuperar/:token" element={<ResetPasswordPage />} />
         </Route>
       </Route>
 
