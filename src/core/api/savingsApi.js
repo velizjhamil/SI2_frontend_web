@@ -15,6 +15,16 @@ export async function openCuenta(payload) {
   return data
 }
 
+export async function depositar(cuentaId, monto) {
+  const { data } = await client.post(`/ahorros/cuentas/${cuentaId}/depositos`, { monto })
+  return data
+}
+
+export async function retirar(cuentaId, monto) {
+  const { data } = await client.post(`/ahorros/cuentas/${cuentaId}/retiros`, { monto })
+  return data
+}
+
 export async function listCertificados(params = {}) {
   const { data } = await client.get('/ahorros/certificados', { params })
   return data

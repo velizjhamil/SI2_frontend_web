@@ -72,8 +72,8 @@ function OperationModal({ type, socios, monedas, onClose, onSubmit, saving, erro
   )
 }
 
-function AccountsTable({ accounts }) {
-  return <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-6 py-3">Cuenta</th><th className="px-6 py-3">Socio</th><th className="px-6 py-3">Saldo disponible</th><th className="px-6 py-3">Estado</th></tr></thead><tbody className="divide-y divide-slate-100">{accounts.map((account) => <tr key={account.id}><td className="px-6 py-3 font-mono text-xs">{account.numero}</td><td className="px-6 py-3">Socio #{account.socio_id}</td><td className="px-6 py-3 font-semibold">{money(account.saldo_disponible, account.moneda.simbolo)}</td><td className="px-6 py-3"><Badge variant={account.estado === 'ACTIVA' ? 'green' : 'slate'}>{account.estado}</Badge></td></tr>)}</tbody></table></div>
+function AccountsTable({ accounts, onMovement }) {
+  return <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-6 py-3">Cuenta</th><th className="px-6 py-3">Socio</th><th className="px-6 py-3">Saldo disponible</th><th className="px-6 py-3">Estado</th>{onMovement && <th className="px-6 py-3 text-right">Operaciones</th>}</tr></thead><tbody className="divide-y divide-slate-100">{accounts.map((account) => <tr key={account.id}><td className="px-6 py-3 font-mono text-xs">{account.numero}</td><td className="px-6 py-3">Socio #{account.socio_id}</td><td className="px-6 py-3 font-semibold">{money(account.saldo_disponible, account.moneda.simbolo)}</td><td className="px-6 py-3"><Badge variant={account.estado === 'ACTIVA' ? 'green' : 'slate'}>{account.estado}</Badge></td>{onMovement && <td className="px-6 py-3 text-right"><button type="button" onClick={() => onMovement({ type: 'DEPOSITO', account })} className="mr-3 text-xs font-semibold text-forest">Depositar</button><button type="button" onClick={() => onMovement({ type: 'RETIRO', account })} className="text-xs font-semibold text-red-600">Retirar</button></td>}</tr>)}</tbody></table></div>
 }
 
 function CertificatesTable({ certificates }) {
@@ -90,6 +90,7 @@ export default function SavingsModulePage({ personal = false }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+  const [movement, setMovement] = useState(null)
 
   async function load() {
     setLoading(true)
@@ -132,14 +133,31 @@ export default function SavingsModulePage({ personal = false }) {
     }
   }
 
+  async function submitMovement(event) {
+    event.preventDefault()
+    setSaving(true)
+    setError(null)
+    try {
+      if (movement.type === 'DEPOSITO') await savingsApi.depositar(movement.account.id, Number(movement.amount))
+      else await savingsApi.retirar(movement.account.id, Number(movement.amount))
+      setMovement(null)
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const totalBalance = accounts.reduce((total, account) => total + Number(account.saldo_disponible ?? 0), 0)
   return (
     <div className="space-y-8 animate-fade-in">
       <PageHeader title={personal ? 'Mi cuenta' : 'Ahorros y aportes'} subtitle={personal ? 'Consulta tus cuentas de ahorro, saldos y certificados de aportación.' : 'Administra cuentas de ahorro y certificados de aportación.'} action={!personal && <div className="flex gap-2"><Button size="sm" onClick={() => setModal('cuenta')}>Abrir cuenta</Button><Button size="sm" variant="secondary" onClick={() => setModal('certificado')}>Emitir aporte</Button></div>} />
       <div className="grid gap-4 md:grid-cols-3"><SummaryCard label="Cuentas activas" value={accounts.filter((account) => account.estado === 'ACTIVA').length} detail="Cuentas de ahorro" tone="text-navy" /><SummaryCard label="Saldo total" value={money(totalBalance)} detail="Suma referencial de saldos" tone="text-forest" /><SummaryCard label="Aportes emitidos" value={certificates.length} detail="Certificados registrados" tone="text-amber-700" /></div>
       {error && <AlertBanner variant="error" onClose={() => setError(null)}>{error}</AlertBanner>}
-      <Card><div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-6 py-4"><div className="flex gap-1 rounded-xl bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('cuentas')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeTab === 'cuentas' ? 'bg-white text-navy shadow-sm' : 'text-slate-500'}`}>Cuentas de ahorro</button><button type="button" onClick={() => setActiveTab('aportes')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeTab === 'aportes' ? 'bg-white text-navy shadow-sm' : 'text-slate-500'}`}>Aportes</button></div><Button type="button" variant="secondary" size="sm" onClick={load} disabled={loading}>Recargar</Button></div>{loading ? <p className="px-6 py-14 text-center text-sm text-slate-500">Cargando información…</p> : activeTab === 'cuentas' ? (accounts.length ? <AccountsTable accounts={accounts} /> : <p className="px-6 py-14 text-center text-sm text-slate-500">No hay cuentas de ahorro registradas.</p>) : (certificates.length ? <CertificatesTable certificates={certificates} /> : <p className="px-6 py-14 text-center text-sm text-slate-500">No hay certificados de aportación registrados.</p>)}</Card>
+      <Card><div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-6 py-4"><div className="flex gap-1 rounded-xl bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('cuentas')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeTab === 'cuentas' ? 'bg-white text-navy shadow-sm' : 'text-slate-500'}`}>Cuentas de ahorro</button><button type="button" onClick={() => setActiveTab('aportes')} className={`rounded-lg px-4 py-2 text-sm font-semibold ${activeTab === 'aportes' ? 'bg-white text-navy shadow-sm' : 'text-slate-500'}`}>Aportes</button></div><Button type="button" variant="secondary" size="sm" onClick={load} disabled={loading}>Recargar</Button></div>{loading ? <p className="px-6 py-14 text-center text-sm text-slate-500">Cargando información…</p> : activeTab === 'cuentas' ? (accounts.length ? <AccountsTable accounts={accounts} onMovement={setMovement} /> : <p className="px-6 py-14 text-center text-sm text-slate-500">No hay cuentas de ahorro registradas.</p>) : (certificates.length ? <CertificatesTable certificates={certificates} /> : <p className="px-6 py-14 text-center text-sm text-slate-500">No hay certificados de aportación registrados.</p>)}</Card>
       {modal && <OperationModal type={modal} socios={socios} monedas={monedas} onClose={() => setModal(null)} onSubmit={submitOperation} saving={saving} error={error} />}
+      {movement && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"><form onSubmit={submitMovement} className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"><h2 className="text-lg font-semibold">{movement.type === 'DEPOSITO' ? 'Depositar' : 'Retirar'} · {movement.account.numero}</h2><input required min="0.01" step="0.01" type="number" autoFocus value={movement.amount ?? ''} onChange={(e) => setMovement({ ...movement, amount: e.target.value })} className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Monto" /><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setMovement(null)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button><button className="rounded-lg bg-navy px-3 py-2 text-sm font-semibold text-white">Confirmar</button></div></form></div>}
     </div>
   )
 }
